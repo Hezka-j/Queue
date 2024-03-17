@@ -1,5 +1,110 @@
-﻿#include <iostream>
+#include <iostream>
 using namespace std;
+
+class Deque {
+    struct Node {
+        Node* next = nullptr;
+        Node* prev = nullptr;
+        int data = 0;
+    };
+    Node* head = nullptr;
+    Node* tail = nullptr;
+    int count = 0;
+public:
+    ~Deque(){
+        while (!IsEmpty())
+        {
+            PopFront();
+        }
+    }
+    bool IsEmpty()
+    {
+        return count == 0;
+    }
+
+    void PushBack(int elem)
+    {
+        auto newElem = new Node;
+        newElem->data = elem;
+
+        if (IsEmpty())
+        {
+            head = newElem;
+        }
+        else
+        {
+            newElem->prev = tail;
+            tail->next = newElem;
+        }
+        tail = newElem;
+        count++;
+    }
+
+    void PushFront(int elem)
+    {
+        auto newElem = new Node;
+        newElem->data = elem;
+
+        if (IsEmpty())
+        {
+            tail = newElem;
+        }
+        else
+        {
+            head->prev = newElem;
+            newElem->next = head;
+        }
+            
+        head = newElem;
+        count++;
+    }
+
+    int PopBack()
+    {
+        if (IsEmpty())
+            return 0;
+        auto temp = tail;
+        int number = tail->data;
+        tail = tail->prev;
+        delete temp;
+        if (tail == nullptr)
+            head = nullptr;
+        else
+            tail->next = nullptr;
+        count--;
+        return number;
+    }
+
+    int PopFront()
+    {
+        if (IsEmpty())
+            return 0;
+        auto temp = head;
+        int number = head->data;
+        head = head->next;
+        delete temp;
+        if (head == nullptr)
+            tail = nullptr;
+        else
+            head->prev = nullptr;
+        count--;
+        return number;
+    }
+
+    void Print()
+    {
+        if (IsEmpty())
+            return;
+        auto current = head;
+        while (current != nullptr)
+        {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << "\n";
+    }
+};
+
 class PriorityQueue {
     int* data = nullptr;
     int* priority = nullptr;
@@ -40,6 +145,8 @@ public:
 
     void Sort()
     {
+        if (IsEmpty() || IsFull())
+            return;
         int* temp = new int[max_count];
         int max = priority[0];
         for (int i = 1; i < count; i++)
@@ -89,20 +196,48 @@ public:
     }
 
     int Dequeue()
-    {               
-        return data[--count];
+    {           
+        if (IsEmpty())
+            return 0;
+        int* first = data;
+        int number = data[0];
+        int* firstPrir = priority;
+        for (int i = 0; i < count; i++)
+        {
+            data[i] = data[i + 1];
+            priority[i] = priority[i + 1];
+        }
+        /*delete first;
+        delete firstPrir;*/
+        count--;
+        return number;
     }
 
     void Print()
     {
-        for (int i = 0; i < count; i++)
+        if(!IsEmpty())
         {
-            cout <<"Data: " << data[i] << " priority: " << priority[i] << "\n";
+            for (int i = 0; i < count; i++)
+            {
+                cout << "Data: " << data[i] << " priority: " << priority[i] << "\n";
+            }
         }
     }
 };
 int main()
 {
+    /*Deque deq;
+    deq.PushFront(3);
+    deq.PushFront(7);
+    deq.PushFront(5);
+
+    deq.PushBack(10);
+    deq.PushBack(8);
+    deq.PushBack(9);
+
+    deq.PopFront();
+    deq.Print();*/
+
     PriorityQueue q(10);
     q.Enqueue(1, 2);
     //q.Print();
@@ -116,16 +251,4 @@ int main()
 
     cout << q.Dequeue() << "\n";
     q.Print();
-
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
